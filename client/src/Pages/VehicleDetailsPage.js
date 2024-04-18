@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -29,8 +29,10 @@ const TestDriveButton = styled(Button)({
 });
 
 function VehicleDetailsPage() {
+const navigate = useNavigate();
   const { id } = useParams();
   const [vehicle, setVehicle] = useState(null);
+  const uid = localStorage.getItem('userId');
 
   useEffect(() => {
     async function fetchVehicle() {
@@ -45,9 +47,20 @@ function VehicleDetailsPage() {
     fetchVehicle();
   }, [id]);
 
-  const handleRequestTestDrive = () => {
-    // Logic to handle request test drive
-    console.log('Request Test Drive clicked');
+  const handleRequestTestDrive = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/testdrive/request', {
+        vehicleId: id,
+        requestedDate: new Date().toISOString(), // or format the date as required
+        userId: uid
+      });
+      alert('Test Drive Requested');
+      console.log('Test drive requested:', response.data.testDrive);
+      // Optionally, you can navigate the user to a confirmation page or show a success message here
+    } catch (error) {
+      console.error('Error requesting test drive:', error);
+      // Optionally, you can show an error message to the user
+    }
   };
 
   if (!vehicle) {

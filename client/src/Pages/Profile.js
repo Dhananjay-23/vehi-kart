@@ -1,65 +1,9 @@
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-// import Typography from '@mui/material/Typography';
-
-// const UserProfilePage = () => {
-//   const [user, setUser] = useState(null);
-//   const id = localStorage.getItem('userId');
-
-//   useEffect(() => {
-//     const fetchUserProfile = async () => {
-//       try {
-//         const response = await axios.get(`http://localhost:5000/user/${id}`);
-//         setUser(response.data.user);
-//       } catch (error) {
-//         console.error('Error fetching user profile:', error);
-//       }
-//     };
-
-//     fetchUserProfile();
-//   }, [id]);
-
-//   if (!user) {
-//     return <Typography variant="h4">Loading...</Typography>;
-//   }
-
-//   return (
-//     <div>
-//       <Typography variant="h4">User Profile</Typography>
-//       <Typography variant="h6">Name: {user.name}</Typography>
-//       <Typography variant="h6">Email: {user.email}</Typography>
-//       <Typography variant="h6">Expert: {user.isExpert ? 'Yes' : 'No'}</Typography>
-      
-//       <Typography variant="h6">Added Vehicles:</Typography>
-//       {user.addedVehicles && user.addedVehicles.length > 0 ? (
-//         user.addedVehicles.map((vehicle) => (
-//           <Typography key={vehicle._id}>{vehicle.manufacturer} {vehicle.model}</Typography>
-//         ))
-//       ) : (
-//         <Typography>No vehicles added yet.</Typography>
-//       )}
-
-//       {user.isExpert && (
-//         <div>
-//           <Typography variant="h6">Requested Test Drives:</Typography>
-//           {user.requestedTestDrives && user.requestedTestDrives.map((testDriveId) => (
-//             <Typography key={testDriveId}>{testDriveId}</Typography>
-//           ))}
-          
-//           <Typography variant="h6">Inspections:</Typography>
-//           {user.inspections && user.inspections.map((inspectionId) => (
-//             <Typography key={inspectionId}>{inspectionId}</Typography>
-//           ))}
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default UserProfilePage;
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Typography from '@mui/material/Typography';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const UserProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -78,54 +22,77 @@ const UserProfilePage = () => {
     fetchUserProfile();
   }, [id]);
 
+  const handleRemoveVehicle = (vehicleId) => {
+    // Implement removal logic here
+    console.log('Removing vehicle with ID:', vehicleId);
+  };
+
   if (!user) {
     return <Typography variant="h4">Loading...</Typography>;
   }
 
   return (
-    <div>
-      <Typography variant="h4">User Profile</Typography>
-      <Typography variant="h6">Name: {user.name}</Typography>
-      <Typography variant="h6">Email: {user.email}</Typography>
-      <Typography variant="h6">Expert: {user.isExpert ? 'Yes' : 'No'}</Typography>
-      
-      <Typography variant="h6">Added Vehicles:</Typography>
-      {user.addedVehicles && user.addedVehicles.length > 0 ? (
-        user.addedVehicles.map((vehicle) => (
-          <Typography key={vehicle._id}>{vehicle.manufacturer} {vehicle.model}</Typography>
-        ))
-      ) : (
-        <Typography>No vehicles added yet.</Typography>
-      )}
-
-      {user.isExpert && (
-        <div>
-          <Typography variant="h6">Requested Test Drives:</Typography>
+    <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'row', justifyContent:'center'}}>
+    <div style={{padding: '3%'}}>
+      {/* <Avatar alt="Profile Image" src="/dummy_profile_image.jpg" sx={{ width: 100, height: 100, marginBottom: 20 }} /> */}
+      <Typography variant="h4" gutterBottom>User Profile</Typography>
+      <Typography variant="h6" gutterBottom>Name: {user.name}</Typography>
+      <Typography variant="h6" gutterBottom>Email: {user.email}</Typography>
+      <Typography variant="h6" gutterBottom>Expert: {user.isExpert ? 'Yes' : 'No'}</Typography>
+      </div>
+      <div style={{padding: '3% 10%'}}>
+      <div style={{ marginTop: 20 }}>
+        <Typography variant="h6" gutterBottom>Added Vehicles:</Typography>
+        {user.addedVehicles && user.addedVehicles.length > 0 ? (
+          user.addedVehicles.map((vehicle) => (
+            <div key={vehicle._id} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
+              <Typography>{vehicle.manufacturer} {vehicle.model}</Typography>
+              <Button
+                variant="outlined"
+                color="error"
+                startIcon={<DeleteIcon />}
+                onClick={() => handleRemoveVehicle(vehicle._id)}
+                style={{ marginLeft: 10 }}
+              >
+                Remove
+              </Button>
+            </div>
+          ))
+        ) : (
+          <Typography>No vehicles added yet.</Typography>
+        )}
+      </div>
+      <div style={{ marginTop: 40 }}>
+      <Typography variant="h6" gutterBottom>Requested Test Drives:</Typography>
           {user.requestedTestDrives && user.requestedTestDrives.length > 0 ? (
             user.requestedTestDrives.map((testDrive) => (
-              <div key={testDrive._id}>
-              <Typography>Vehicle Requested for TestDrive: {testDrive.vehicle.model}</Typography>
-              <Typography>Vehicle Requested Date: {testDrive.requestedDate}</Typography>
-              <Typography>TestDrive Status: {testDrive.status}</Typography>
+              <div key={testDrive._id} style={{ marginBottom: 20 }}>
+                <Typography variant="subtitle1">Vehicle Requested for Test Drive: {testDrive.vehicle.model}</Typography>
+                <Typography variant="subtitle1">Requested Date: {testDrive.requestedDate}</Typography>
+                <Typography variant="subtitle1">Status: {testDrive.status}</Typography>
               </div>
             ))
           ) : (
             <Typography>No requested test drives.</Typography>
           )}
-          
-          <Typography variant="h6">Inspected Vehicles:</Typography>
+          </div>
+      {user.isExpert && (
+        <div style={{ marginTop: 40 }}>
+          <Typography variant="h6" gutterBottom>Inspected Vehicles:</Typography>
           {user.inspectedVehicles && user.inspectedVehicles.length > 0 ? (
             user.inspectedVehicles.map((inspection) => (
-              <Typography key={inspection._id}>{inspection.brand} {inspection.model}</Typography>
+              <div key={inspection._id} style={{ marginBottom: 10 }}>
+                <Typography>{inspection.brand} {inspection.model} ✅</Typography>
+              </div>
             ))
           ) : (
             <Typography>No inspected vehicles.</Typography>
           )}
         </div>
       )}
+      </div>
     </div>
   );
 };
 
 export default UserProfilePage;
-

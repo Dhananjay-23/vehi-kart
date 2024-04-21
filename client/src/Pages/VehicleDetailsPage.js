@@ -4,6 +4,7 @@ import axios from 'axios';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
+import {TextField} from '@mui/material'
 
 const Container = styled('div')({
   padding: '20px',
@@ -24,48 +25,88 @@ const DetailsItem = styled(Typography)({
   marginBottom: '10px',
 });
 
-const TestDriveButton = styled(Button)({
-  marginTop: '20px',
-});
-
-function VehicleDetailsPage() {
-const navigate = useNavigate();
+const VehicleDetailsPage = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const [vehicle, setVehicle] = useState(null);
+  const [user, setUser] = useState(null);
   const uid = localStorage.getItem('userId');
-
+  const [reviewData, setReviewData] = useState("");
+  // console.log(uid);
   useEffect(() => {
-    async function fetchVehicle() {
+    async function fetchVehicleAndUser() {
       try {
-        const response = await axios.get(`http://localhost:5000/vehicle/${id}`);
-        setVehicle(response.data);
+        // Fetch vehicle details
+        const vehicleResponse = await axios.get(`http://localhost:5000/vehicle/${id}`);
+        setVehicle(vehicleResponse.data);
+
+        // Fetch user details to check if they're an expert
+        const userResponse = await axios.get(`http://localhost:5000/user/${uid}`);
+        setUser(userResponse.data);
       } catch (error) {
-        console.error('Error fetching vehicle details:', error);
+        console.error('Error fetching data:', error);
       }
     }
 
-    fetchVehicle();
-  }, [id]);
-
+    fetchVehicleAndUser();
+  }, [id, uid]);
+  //console.log(user.user.email);
   const handleRequestTestDrive = async () => {
     try {
       const response = await axios.post('http://localhost:5000/testdrive/request', {
         vehicleId: id,
-        requestedDate: new Date().toISOString(), // or format the date as required
-        userId: uid
+        requestedDate: new Date().toISOString(),
+        userId: uid,
       });
       alert('Test Drive Requested');
       console.log('Test drive requested:', response.data.testDrive);
-      // Optionally, you can navigate the user to a confirmation page or show a success message here
     } catch (error) {
       console.error('Error requesting test drive:', error);
-      // Optionally, you can show an error message to the user
     }
   };
 
-  if (!vehicle) {
+  const handleUpdateVehicle = () => {
+    navigate(`/vehicle/update/${id}`);
+  };
+
+  const handleDeleteVehicle = async () => {
+    try {
+      await axios.delete(`http://localhost:5000/vehicle/${id}`);
+      alert('Vehicle deleted');
+      navigate('/');
+    } catch (error) {
+      console.error('Error deleting vehicle:', error);
+    }
+  };
+
+const handleMarkInspected = async (id, userId) => {
+  try {
+    const response = await axios.put(`http://localhost:5000/vehicle/inspect/${id}`, { userId });
+    //return response.data;
+    alert("Vehicle marked as Inspected ")
+  } catch (error) {
+    alert("Failed to mark as inspected")
+  }
+};
+
+const handleAddReview = async (id, reviewData) => {   
+  try{ 
+    const response = await axios.put(`http://localhost:5000/vehicle/review/${id}`, {reviewData});
+    alert("Review Added successfully!")
+  } catch (error) {
+    alert("Could not add review. Please try again ")
+  }
+  setReviewData("")
+};
+
+  if (!vehicle || !user) {
     return <Typography>Loading...</Typography>;
   }
+
+  const isOwner = vehicle.owner._id === uid;
+  const isExpert = user.user.isExpert;
+  const inspectedByUser = vehicle.isInspected && vehicle.inspectedBy._id === uid;
+  console.log(isExpert);
 
   return (
     <Container>
@@ -79,12 +120,49 @@ const navigate = useNavigate();
       <DetailsItem variant="body1">{`Reviews: ${vehicle.reviews || 'No reviews'}`}</DetailsItem>
       <DetailsItem variant="body1">{`Contact Number: ${vehicle.contactNumber}`}</DetailsItem>
       <DetailsItem variant="body1">{`Inspected: ${vehicle.isInspected ? 'Yes' : 'No'}`}</DetailsItem>
-      {vehicle.isInspected && <DetailsItem variant="body1">{`Inspected By: ${vehicle.inspectedBy.name}`}</DetailsItem>}
-      <TestDriveButton variant="contained" color="primary" onClick={handleRequestTestDrive}>
-        Request Test Drive
-      </TestDriveButton>
+      {vehicle.isInspected && (
+        <DetailsItem variant="body1">{`Inspected By: ${vehicle.inspectedBy.name}`}</DetailsItem>
+      )}
+
+      {isOwner ? (
+        <div>
+          <Button variant="contained" color="primary" onClick={handleUpdateVehicle}>
+            Update Vehicle
+          </Button>
+          <Button variant="contained" color="secondary" onClick={handleDeleteVehicle} style={{ marginLeft: '10px' }}>
+            Delete Vehicle
+          </Button>
+        </div>
+      ) : (
+        <Button variant="contained" color="primary" onClick={handleRequestTestDrive}>
+          Request Test Drive
+        </Button>
+      )}
+
+      {isExpert && !inspectedByUser && (
+      <div>
+        <Button variant="contained" color="primary" onClick={() => handleMarkInspected(id,uid)} style={{ marginTop: '10px' }}>
+          Mark as Inspected
+        </Button></div>
+      )}
+
+      {isExpert && inspectedByUser && (
+        <div style={{padding : '2%'}}>
+        <TextField
+                    label="Review"
+                    name="Review"
+                    type="text"
+                    value={reviewData}
+                    onChange={(e) => setReviewData(e.target.value)}
+                    required
+                  />
+        <Button variant="contained" color="primary" onClick={()=> handleAddReview(id , reviewData)} style={{ marginTop: '10px' }}>
+          Add Review
+        </Button></div>
+      )}
     </Container>
   );
-}
+};
 
 export default VehicleDetailsPage;
+

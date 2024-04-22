@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+ import React, { useState } from 'react';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
 import axios from 'axios';
 
@@ -8,10 +8,9 @@ const CreateUser = () => {
     email: '',
     password: '',
     isExpert: false,
+    phoneNumber: '', // New field for phone number
   });
-  const handleNavigate = ()=>{
-    
-  }
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -23,7 +22,7 @@ const CreateUser = () => {
       const response = await axios.post('http://localhost:5000/user/signup', formData); // Send POST request to signup endpoint
       console.log(response.data); // Log the response
       alert('User created successfully!'); // Show a success message
-      localStorage.setItem("userData", formData);
+      localStorage.setItem("userData", JSON.stringify(formData)); // Store user data in local storage
     } catch (error) {
       console.error('Error creating user:', error);
       alert('Failed to create user. Please try again.'); // Show an error message
@@ -34,35 +33,48 @@ const CreateUser = () => {
     <Container maxWidth="sm">
       <Typography variant="h4">Create An Account</Typography>
       <form onSubmit={handleSubmit}>
-      <Box mb={2}>
-        <TextField
-          fullWidth
-          label="Name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        /></Box>
-         <Box mb={2}>
-        <TextField
-          fullWidth
-          type="email"
-          label="Email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        /></Box>
-         <Box mb={2}>
-        <TextField
-          fullWidth
-          type="password"
-          label="Password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        /></Box>
+        <Box mb={2}>
+          <TextField
+            fullWidth
+            label="Name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+        </Box>
+        <Box mb={2}>
+          <TextField
+            fullWidth
+            type="email"
+            label="Email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+        </Box>
+        <Box mb={2}>
+          <TextField
+            fullWidth
+            type="password"
+            label="Password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+        </Box>
+        <Box mb={2}>
+          <TextField
+            fullWidth
+            label="Phone Number" // New field for phone number
+            name="phoneNumber"
+            value={formData.phoneNumber}
+            onChange={handleChange}
+            required
+          />
+        </Box>
         <div>
           <input
             type="checkbox"

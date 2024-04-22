@@ -89,24 +89,30 @@ const handleMarkInspected = async (id, userId) => {
   }
 };
 
-const handleAddReview = async (id, reviewData) => {   
+const handleAddReview = async (id,uid,reviewData) => {   
   try{ 
-    const response = await axios.put(`http://localhost:5000/vehicle/review/${id}`, {reviewData});
+    const response = await axios.put(`http://localhost:5000/vehicle/review/${id}`, {
+    userId: uid,
+    reviews : reviewData});
     alert("Review Added successfully!")
   } catch (error) {
     alert("Could not add review. Please try again ")
+    console.error(error);
   }
   setReviewData("")
 };
 
-  if (!vehicle || !user) {
-    return <Typography>Loading...</Typography>;
+if (!user) {
+  return <Typography>Login to view Details</Typography>;
+}
+  if (!vehicle) {
+    return <Typography>Failed to load Vehicle Details </Typography>;
   }
 
   const isOwner = vehicle.owner._id === uid;
   const isExpert = user.user.isExpert;
   const inspectedByUser = vehicle.isInspected && vehicle.inspectedBy._id === uid;
-  console.log(isExpert);
+ // console.log(isExpert);
 
   return (
     <Container>
@@ -156,7 +162,7 @@ const handleAddReview = async (id, reviewData) => {
                     onChange={(e) => setReviewData(e.target.value)}
                     required
                   />
-        <Button variant="contained" color="primary" onClick={()=> handleAddReview(id , reviewData)} style={{ marginTop: '10px' }}>
+        <Button variant="contained" color="primary" onClick={()=> handleAddReview(id ,uid , reviewData)} style={{ marginTop: '10px' }}>
           Add Review
         </Button></div>
       )}

@@ -3,7 +3,8 @@
 // import Typography from '@mui/material/Typography';
 // import Avatar from '@mui/material/Avatar';
 // import Button from '@mui/material/Button';
-// import DeleteIcon from '@mui/icons-material/Delete';
+// import ViewIcon from '@mui/icons-material/Visibility';
+// import { useNavigate } from 'react-router';
 
 // const UserProfilePage = () => {
 //   const [user, setUser] = useState(null);
@@ -21,10 +22,9 @@
 
 //     fetchUserProfile();
 //   }, [id]);
-
-//   const handleRemoveVehicle = (vehicleId) => {
-    
-//     console.log('Removing vehicle with ID:', vehicleId);
+//   const navigate = useNavigate();
+//   const handleViewVehicle =  async  (vehicleId) => {
+//     navigate(`/vehicle/${vehicleId}`)
 //   };
 
 //   if (!user) {
@@ -32,38 +32,39 @@
 //   }
 
 //   return (
-//     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'row', justifyContent:'center'}}>
-//     <div style={{padding: '3%'}}>
-//       {/* <Avatar alt="Profile Image" src="/dummy_profile_image.jpg" sx={{ width: 100, height: 100, marginBottom: 20 }} /> */}
-//       <Typography variant="h4" gutterBottom>User Profile</Typography>
-//       <Typography variant="h6" gutterBottom>Name: {user.name}</Typography>
-//       <Typography variant="h6" gutterBottom>Email: {user.email}</Typography>
-//       <Typography variant="h6" gutterBottom>Expert: {user.isExpert ? 'Yes' : 'No'}</Typography>
+//     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+//       <div style={{ padding: '3%' }}>
+//         <Typography variant="h4" gutterBottom>User Profile</Typography>
+//         <Typography variant="h6" gutterBottom>Name: {user.name}</Typography>
+//         <Typography variant="h6" gutterBottom>Email: {user.email}</Typography>
+//         <Typography variant="h6" gutterBottom>Expert: {user.isExpert ? 'Yes' : 'No'}</Typography>
 //       </div>
-//       <div style={{padding: '3% 10%'}}>
-//       <div style={{ marginTop: 20 }}>
-//         <Typography variant="h6" gutterBottom>Added Vehicles:</Typography>
-//         {user.addedVehicles && user.addedVehicles.length > 0 ? (
-//           user.addedVehicles.map((vehicle) => (
-//             <div key={vehicle._id} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
-//               <Typography>{vehicle.manufacturer} {vehicle.model}</Typography>
-//               <Button
-//                 variant="outlined"
-//                 color="error"
-//                 startIcon={<DeleteIcon />}
-//                 onClick={() => handleRemoveVehicle(vehicle._id)}
-//                 style={{ marginLeft: 10 }}
-//               >
-//                 Remove
-//               </Button>
-//             </div>
-//           ))
-//         ) : (
-//           <Typography>No vehicles added yet.</Typography>
-//         )}
-//       </div>
-//       <div style={{ marginTop: 40 }}>
-//       <Typography variant="h6" gutterBottom>Requested Test Drives:</Typography>
+
+//       <div style={{ padding: '3% 10%' }}>
+//         <div style={{ marginTop: 20 }}>
+//           <Typography variant="h6" gutterBottom>Added Vehicles:</Typography>
+//           {user.addedVehicles && user.addedVehicles.length > 0 ? (
+//             user.addedVehicles.map((vehicle) => (
+//               <div key={vehicle._id} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
+//                 <Typography>{vehicle.manufacturer} {vehicle.model}</Typography>
+//                 <Button
+//                   variant="outlined"
+//                   color="primary"
+//                   startIcon={<ViewIcon />}
+//                   onClick={() => handleViewVehicle(vehicle._id)}
+//                   style={{ marginLeft: 10 }}
+//                 >
+//                   View Vehicle
+//                 </Button>
+//               </div>
+//             ))
+//           ) : (
+//             <Typography>No vehicles added yet.</Typography>
+//           )}
+//         </div>
+
+//         <div style={{ marginTop: 40 }}>
+//           <Typography variant="h6" gutterBottom>Requested Test Drives:</Typography>
 //           {user.requestedTestDrives && user.requestedTestDrives.length > 0 ? (
 //             user.requestedTestDrives.map((testDrive) => (
 //               <div key={testDrive._id} style={{ marginBottom: 20 }}>
@@ -75,22 +76,23 @@
 //           ) : (
 //             <Typography>No requested test drives.</Typography>
 //           )}
-//           </div>
-//       {user.isExpert && (
-//         <div style={{ marginTop: 40 }}>
-//           <Typography variant="h6" gutterBottom>Inspected Vehicles:</Typography>
-//           {user.inspectedVehicles && user.inspectedVehicles.length > 0 ? (
-//             user.inspectedVehicles.map((inspection) => (
-//               <div key={inspection._id} style={{ marginBottom: 10 }}>
-//                 <Typography>{inspection.brand} {inspection.model} ✅</Typography>
-//               </div>
-//             ))
-//           ) : (
-//             <Typography>No inspected vehicles.</Typography>
-//           )}
 //         </div>
-//       )}
-//       </div>
+
+//         {user.isExpert && (
+//           <div style={{ marginTop: 40 }}>
+//             <Typography variant="h6" gutterBottom>Inspected Vehicles:</Typography>
+//             {user.inspectedVehicles && user.inspectedVehicles.length > 0 ? (
+//               user.inspectedVehicles.map((inspection) => (
+//                 <div key={inspection._id} style={{ marginBottom: 10 }}>
+//                   <Typography>{inspection.brand} {inspection.model} ✅</Typography>
+//                 </div>
+//               ))
+//             ) : (
+//               <Typography>No inspected vehicles.</Typography>
+//             )}
+//           </div>)}
+      
+//     </div>
 //     </div>
 //   );
 // };
@@ -99,13 +101,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Typography from '@mui/material/Typography';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import ViewIcon from '@mui/icons-material/Visibility';
 import { useNavigate } from 'react-router';
 
 const UserProfilePage = () => {
   const [user, setUser] = useState(null);
+  const [pendingTestDrives, setPendingTestDrives] = useState([]);
   const id = localStorage.getItem('userId');
 
   useEffect(() => {
@@ -118,11 +120,23 @@ const UserProfilePage = () => {
       }
     };
 
+    const fetchPendingTestDrives = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/testdrive/pending');
+        setPendingTestDrives(response.data.pendingTestDrives);
+      } catch (error) {
+        console.error('Error fetching pending test drives:', error);
+      }
+    };
+
     fetchUserProfile();
+    fetchPendingTestDrives(); // Fetch pending test drives
   }, [id]);
+  
   const navigate = useNavigate();
-  const handleViewVehicle =  async  (vehicleId) => {
-    navigate(`/vehicle/${vehicleId}`)
+
+  const handleViewVehicle = async (vehicleId) => {
+    navigate(`/vehicle/${vehicleId}`);
   };
 
   if (!user) {
@@ -141,7 +155,7 @@ const UserProfilePage = () => {
       <div style={{ padding: '3% 10%' }}>
         <div style={{ marginTop: 20 }}>
           <Typography variant="h6" gutterBottom>Added Vehicles:</Typography>
-          {user.addedVehicles && user.addedVehicles.length > 0 ? (
+          {user.addedVehicles?.length > 0 ? (
             user.addedVehicles.map((vehicle) => (
               <div key={vehicle._id} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
                 <Typography>{vehicle.manufacturer} {vehicle.model}</Typography>
@@ -163,7 +177,7 @@ const UserProfilePage = () => {
 
         <div style={{ marginTop: 40 }}>
           <Typography variant="h6" gutterBottom>Requested Test Drives:</Typography>
-          {user.requestedTestDrives && user.requestedTestDrives.length > 0 ? (
+          {user.requestedTestDrives?.length > 0 ? (
             user.requestedTestDrives.map((testDrive) => (
               <div key={testDrive._id} style={{ marginBottom: 20 }}>
                 <Typography variant="subtitle1">Vehicle Requested for Test Drive: {testDrive.vehicle.model}</Typography>
@@ -176,10 +190,25 @@ const UserProfilePage = () => {
           )}
         </div>
 
+        <div style={{ marginTop: 40 }}>
+          <Typography variant="h6" gutterBottom>Pending Test Drives:</Typography>
+          {pendingTestDrives?.length > 0 ? (
+            pendingTestDrives.map((testDrive) => (
+              <div key={testDrive._id} style={{ marginBottom: 20 }}>
+                <Typography variant="subtitle1">User: {testDrive.user.name}</Typography>
+                <Typography variant="subtitle1">Vehicle: {testDrive.vehicle.model}</Typography>
+                <Typography variant="subtitle1">Requested Date: {testDrive.requestedDate}</Typography>
+              </div>
+            ))
+          ) : (
+            <Typography>No pending test drives.</Typography>
+          )}
+        </div>
+
         {user.isExpert && (
           <div style={{ marginTop: 40 }}>
             <Typography variant="h6" gutterBottom>Inspected Vehicles:</Typography>
-            {user.inspectedVehicles && user.inspectedVehicles.length > 0 ? (
+            {user.inspectedVehicles?.length > 0 ? (
               user.inspectedVehicles.map((inspection) => (
                 <div key={inspection._id} style={{ marginBottom: 10 }}>
                   <Typography>{inspection.brand} {inspection.model} ✅</Typography>
@@ -188,10 +217,9 @@ const UserProfilePage = () => {
             ) : (
               <Typography>No inspected vehicles.</Typography>
             )}
-          </div>)}
-        {/* )} */}
-      
-    </div>
+        </div>
+          )}
+      </div>
     </div>
   );
 };

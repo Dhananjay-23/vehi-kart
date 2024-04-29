@@ -20,7 +20,7 @@ const CreateUser = () => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5000/user/signup', formData); // Send POST request to signup endpoint
-      console.log(response.data); // Log the response
+      console.log(response.data);
       alert('User created successfully!'); // Show a success message
       localStorage.setItem("userData", JSON.stringify(formData)); // Store user data in local storage
     } catch (error) {

@@ -28,7 +28,6 @@ function Copyright(props) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
 
@@ -76,18 +75,16 @@ const handleSubmit = async (event) => {
       password,
     });
 
-    // Assuming your backend responds with user data including the user ID
     const { user } = response.data;
 
-    // Store the token and user ID in local storage or state
-   // localStorage.setItem('token', token);
+
     localStorage.setItem('userId', user._id);
 
     // Redirect to profile page upon successful login
     navigate('/profile');
   } catch (error) {
+    alert("Failed Sign In.Make sure you have an account and enter valid credentials")
     console.error('Error signing in:', error);
-    // Handle login failure, show an error message or something
   }
 };
   return (
